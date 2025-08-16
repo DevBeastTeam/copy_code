@@ -144,9 +144,24 @@ class UserData with ChangeNotifier {
       req.fields['aboutUs'] = aboutUs;
       req.fields['address'] = address;
 
+      // single file
       if (imagePath.isNotEmpty) {
         req.files.add(await http.MultipartFile.fromPath('image', imagePath));
       }
+
+      // multi files if need uncomment
+      //   if (images.isNotEmpty) {
+      //   for (var i = 0; i < images.length; i++) {
+      //     final imagePath =
+      //         images[i].path; // Agar `XFile` ya `File` use kar rhy ho
+      //     req.files.add(
+      //       await http.MultipartFile.fromPath(
+      //         'images[]', // ✅ Backend agar multiple images array accept kare
+      //         imagePath,
+      //       ),
+      //     );
+      //   }
+      // }
 
       var sendedRequest = await req.send();
       var response = await sendedRequest.stream.bytesToString();
