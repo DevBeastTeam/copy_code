@@ -107,7 +107,8 @@ Notify().getTokenF(context); // get device token. Look Like: `token: abhxasjehaa
 
 🟨 Step 2. 
 For the set Android FCM notification icon,
-paste this in flutterProject/android/app/main/AndroidManifist.xml file
+paste this code in flutterProject/android/app/main/AndroidManifist.xml file
+inside `application` tag
 
 ```xml
       <meta-data
@@ -123,7 +124,7 @@ paste this in flutterProject/android/app/main/AndroidManifist.xml file
             </intent-filter>
         </receiver>
  <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@mipmap/imageNameOnly" />
-    // paste notification image in all mipmap folders 
+      <!-- // paste notification image in all mipmap folders  -->
 ```
 
 
@@ -131,7 +132,7 @@ paste this in flutterProject/android/app/main/AndroidManifist.xml file
 - Test Notification For Coming Or Not
 Set up Firebase Messaging
     If `firebase` is not set up with the Flutter project, then you need to set up this
-After this, click on the left sidebar build tab, inside this on messaging tab. Click on Create your first campaign. If this option is not shown, then refresh this page
+After this, click on the left sidebar run tab, inside this on messaging tab. Click on Create your first campaign. If this option is not shown, then refresh this page
 after creating the first campaign. Then it will show to send notification box. Paste here the FCM Token that you get from the getToken function, and send it for testing
 
 
