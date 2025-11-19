@@ -64,7 +64,7 @@ class Notify {
 
 
   // for background notification message
-  listenBackgroundNotification(context) {
+  listenBackgroundNotification() {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
 
