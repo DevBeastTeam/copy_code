@@ -1,53 +1,29 @@
+🟨 Step 1. 
+### Setup Push Notification
 
-
-
-🟨 Setup Push Notification
-👉 for install flutter push notification
-
-   add this dependencie:
+- add this dependency: in pubspec.yamle file
 ```yaml
  firebase_messaging: 
  googleapis: 
  googleapis_auth:
 ```
 
+- create a file `get_notification.dart`
+ - paste this code
 
-🟢 
-```dart
-import 'package:firebase_messaging/firebase_messaging.dart';
-```
-
-//////////////////////////////////// Step 1 Initilization in Main.dart File ////////////////
-👉 `important: push notification is work only on background when app is terminated or minimize stage
-   for show notification on open app should need to add local notification`
-   
-// add on the top of main function
-
-```dart
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  debugPrint("👉 BG Notify: $message ");
-}
-```
-
-```dart
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  runApp(const MyApp());
-}
-```
-
-//////////////////////////////////// Step 2 Handle From External File ////////////////
 ```dart
 
 import "package:firebase_messaging/firebase_messaging.dart";
 import "package:flutter/material.dart";
 import "../main.dart";
 import "dart:math";
+
+
+// for background message listen
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  debugPrint("👉 BG Notify: $message ");
+}
 
 class Notify {
   FirebaseMessaging msg = FirebaseMessaging.instance;
@@ -66,11 +42,11 @@ class Notify {
     } else if (stngs.authorizationStatus == AuthorizationStatus.provisional) {
       // request permission => provisional means provide
     } else {
-      // have no notify permmssion
+      // have no notify permission
     }
   }
 
-  /////////////////////////
+  // get token for use to send notification
   Future getTokenF(context) async {
     String? token = await msg.getToken();
     debugPrint("👉 token: $token");
@@ -79,52 +55,58 @@ class Notify {
     return token;
   }
 
+  // for refresh the token
   void isTokenRefreshF() {
     msg.onTokenRefresh.listen((event) {
       event.toString();
     });
   }
 
+
+  // for background notification message
+  listenBackgroundNotification(context) {
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  }
+
   /////////////////////////
-  initListenMsgsF(context) {
+  listenNotificationOnOpendApp() {
     FirebaseMessaging.onMessage.listen((event) {
       debugPrint("👉 IN APP Notify: $event ");
         String title = event.notification?.title ?? "";
         String body = event.notification?.body ?? "";
-        // same keys used thats send in payload like in data key is image etc
-        // can used image or image_url
+        // same keys used that's send in payload like in data key is image, etc
+        // can use image or image_url
         String imageUrl = event.data["image"] ??
           "https://www.iconpacks.net/icons/2/free-discount-icon-2045-thumb.png";
-      // call local notification if need
+
+      // call local notification if needed. Because in the open state of the app, the FCM notification does not show
       // showNotification(title: title, body: body, imageUrl: imageUrl);
-      // and handle any thing Like: Navigation, snackbar And Others Etc
+      // and handle anything like: Navigation, snackbar, And Others, here
     });
   }
 
   onClickFcmNotifi(context) {
     FirebaseMessaging.onMessageOpenedApp.listen((event) {
       debugPrint("👉 On Click Notifiaction : $event ");
-      // and handle any thing Like: Navigation, snackbar And Others Etc
+      // and handle anything like: Navigation, snackbar, and others, Etc
     });
   }
 }
 ```
-///////////////////////////////////// end
-🟨 Get Device Token
- get unique device token in home page or any page
 
+### calling function when needed 
+#               or 
+###   `Call it on any first opened page.`
 ```dart
-
-Notify().requestNotifyPermissionF(); // for permssions 
-Notify().initListenMsgsF(context); // on message listen
-Notify().getTokenF(context); // get device tokens
+Notify().requestNotifyPermissionF(); // for permssions
+Notify().listenBackgroundNotification
+Notify().listenNotificationOnOpendApp(); 
+Notify().getTokenF(context); // get device token. Look Like: `token: abhxasjehaanksnsakjsendssywke_mqnw`
 ```
 
- check in terminal debug console to find the token like => `token: abhxasjehaanksnsakjsendssywke_mqnw....`
- its used to send push notification with unique device token where you want to send to specific users or all if want to send to all users should need to collect all users devices tokens by firebase or by api post method and send notification by api with loop of all devices tokens
 
-
-🟨 for set android notificaiton icon
+🟨 Step 2. 
+For the set Android FCM notification icon,
 paste this in flutterProject/android/app/main/AndroidManifist.xml file
 
 ```xml
@@ -141,30 +123,41 @@ paste this in flutterProject/android/app/main/AndroidManifist.xml file
             </intent-filter>
         </receiver>
  <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@mipmap/imageNameOnly" />
+    // paste notification image in all mipmap folders 
 ```
-    // paste notification image in all mipmap folder 
-
-🟨 Setup Firebase Messaging
-    if `firebase` not setup with flutter project then you should need to setup this
-after this click on left sidebar engage tab in this also on messaging tab and and click on create your first campaign if this option is not show then refresh this page
-after creat first campaign open an alert box in this 2 options select first option to show notification outside of the app 
-in next area box enter notification title and text and can enter image link if need then send for test message
-
-🟨 Send Notification From Api
-   for send with api first go to top left project-settings and in cloud messaging enable both 1.firebase cloud messaging api (v1) 2. cloud messaging api(legacy) when for lagecy from another page after enabled go back and copy token key for set it into the post api headers authorization: Bearer AAAjkasakkskla..... 
- =>  for find private server tokens keys go to services account tab from same page and select node.js and generate new private key.
-
-🟨 for send notifications with custom keys by this url 
- - url
-    method: POST.
-    
-   ```dart
-      https://fcm.googleapis.com/fcm/send
-   ```
-    // json data 
-    // can add customKey in Data Key If Needed
 
 
+🟨 Step 3
+- Test Notification For Coming Or Not
+Set up Firebase Messaging
+    If `firebase` is not set up with the Flutter project, then you need to set up this
+After this, click on the left sidebar build tab, inside this on messaging tab. Click on Create your first campaign. If this option is not shown, then refresh this page
+after creating the first campaign. Then it will show to send notification box. Paste here the FCM Token that you get from the getToken function, and send it for testing
+
+
+🟨 Step 4
+# Send Notification From Api
+   To send with api, first go tothe  top left project settings, inside this open the services account tab and download a file with the `generate new private key` button. This is a server key used for sending FCM notifications. Look Like this Type
+   ` var jsonKeys = {
+    "type": "service_account",
+    "project_id": "meetworth-cc6a1",
+    "private_key_id": "c847c1fa2684b97658a6ae6d4e10a43ea60721d0",
+    "private_key":
+        "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqGgjyt3gweTOKd4=\n-----END PRIVATE KEY-----\n",
+    "client_email": "byhasan@meetworth-cc6a1.iam.gserviceaccount.com",
+    "client_id": "109511986734768120683",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url":
+        "https://www.googleapis.com/robot/v1/metadata/x509/byhasan%40meetworth-cc6a1.iam.gserviceaccount.com",
+    "universe_domain": "googleapis.com"
+  };`
+
+
+- create a file `send_fcm_notification.dart`
+  - paste this code
+  - 
 ```dart
 import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'dart:convert';
@@ -176,7 +169,8 @@ Future<String> getTokenKey() async {
   //     await rootBundle.loadString('assets/json/pushkey.json');
   // final creds = auth.ServiceAccountCredentials.fromJson(jsonKeys);
 
-  //----------------- 2. access by json code
+  //----------------- 2. access by JSON code
+  // past your server private key that's downloaded from the Firebase project settings section
   var jsonKeys = {
     "type": "service_account",
     "project_id": "meetworth-cc6a1",
@@ -213,14 +207,14 @@ Future<String> getTokenKey() async {
   return tokenIs;
 }
 
-sendPushMessagef(
+sendFCMNotificationf(
     {required String recipientToken,
     required String title,
     required String body}) async {
   try {
     String serverKeyIs = await getTokenKey();
-    print('👉 Server Key: $serverKeyIs');
 
+    // paste your Firebase project ID here
     const String projectId = 'meetworth-cc6a1'; // Use your Firebase project ID.
 
     final response = await http.post(
