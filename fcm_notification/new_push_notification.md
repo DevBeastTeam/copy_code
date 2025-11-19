@@ -94,12 +94,12 @@ class Notify {
 }
 ```
 
-### calling function when needed 
-#               or 
-###   `Call it on any first opened page.`
+## calling function when needed 
+###               or 
+##   `Call it on any first opened page.`
 ```dart
 Notify().requestNotifyPermissionF(); // for permssions
-Notify().listenBackgroundNotification
+Notify().listenBackgroundNotification();
 Notify().listenNotificationOnOpendApp(); 
 Notify().getTokenF(context); // get device token. Look Like: `token: abhxasjehaanksnsakjsendssywke_mqnw`
 ```
